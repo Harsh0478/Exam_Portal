@@ -1,12 +1,12 @@
 {
-    "mongodb": {
-        "connectionString": "mongodb://localhost:27017/Online-Exam-Portal"
-    },
-    "jwt": {
-        "secret" : "Examination Portal Application"
-    },
-    "mail-credentials" : {
-        "userid" :"<smtp server userId>",
-        "password" : "<smtp server password>"
-    }
+  "mongodb": {
+    "connectionString": "mongodb+srv://test:test047@test.9govf9m.mongodb.net/Online-Exam-Portal?retryWrites=true&w=majority"
+  },
+  "jwt": {
+    "secret" : "Examination Portal Application"
+  },
+  "mail-credentials" : {
+    "userid" :"<smtp server userId>",
+    "password" : "<smtp server password>"
+  }
 }

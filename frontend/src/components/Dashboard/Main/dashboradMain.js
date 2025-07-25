@@ -1,4 +1,3 @@
-import { withStyles} from "@material-ui/core/styles";
 import React from "react";
 import { connect } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
@@ -6,109 +5,142 @@ import { logoutUser, getAdminDetails } from "../../../redux/actions/loginAction"
 import { getDashboardCount } from "../../../redux/actions/dashboardDetails";
 import Auth from "../../../services/Auth";
 import { HomepageHeader } from "../../basic/header/header";
-import logoImg from '../../basic/Homepage/main.jpg'
+import logoImg from "../../basic/Homepage/main.jpg";
 import { MainCard } from "../Card/card";
-import TeacherImg from '../teacher.png';
-import StudentImg from '../student.jfif';
-import SubjectImg from '../subject.jfif';
+import TeacherImg from "../teacher.png";
+import StudentImg from "../student.jfif";
+import SubjectImg from "../subject.jfif";
 import TeacherTable from "../teacherTable/teacherTable";
 import SubjectTable from "../subjectTable/subjectTable";
 import StudentTable from "../studentTable/studentTable";
-
-const useStyles = (theme)=>({
-  logout_btn : {
-    marginLeft : '80%'
-  },
-  headerMargin : {
-    marginTop : 80
-  },
-  inlineblock : {
-    display : 'inline-block'
-  },
-  linkbtn : {
-    color:'black'
-  }
-})
+import "./dashboardMain.css";
 
 class DashboardMain extends React.Component {
   constructor(props) {
-    super(props)
-    this.state = {}
-    this.expand = "none"
+    super(props);
+    this.state = {
+      expandedTable: null,
+    };
   }
 
-  logout(obj) {
-    obj.props.logoutUser();
-    obj.forceUpdate();
-  }
-
-  handleTableExapand(type) {
-    console.log("handle table")
-    if(type === this.expand) {
-      this.expand = "none"
-    } else {
-      this.expand = type
-    }
-    this.forceUpdate();
-  }
-
-  render(){
-    console.log(this.props.user);
-    if(!Auth.retriveToken() || Auth.retriveToken()==='undefined'){
-      return (<Navigate to='/'/>);
-    } else if(!this.props.user.isLoggedIn) {
+  componentDidMount() {
+    if (!this.props.user.isLoggedIn) {
       this.props.getAdminDetails();
-      return (<div></div>);
-    } else {
-      if(!this.props.dashboardDetails.retrived){
-        this.props.getDashboardCount();
-      }
-      let x;
-      if(this.expand === "Teacher") {
-        x = <TeacherTable/>;
-      } else if (this.expand === "Student") {
-        x = <StudentTable/>;
-      } else if (this.expand === "Subject") {
-        x = <SubjectTable/>;
-      }
-        return (
-          <div>
-            <HomepageHeader title='Exam Portal' img={logoImg}/>
-            <div className={this.props.classes.headerMargin}></div>
-            <button onClick={()=>(this.logout(this))} className={this.props.classes.logout_btn} >Logout</button>
-            <br/>
-            <MainCard title='Teacher' value={this.props.dashboardDetails.teacherActive} total={this.props.dashboardDetails.teacherActive + this.props.dashboardDetails.teacherBlocked}  image={TeacherImg} />
-            <div className={this.props.classes.inlineblock}>
-              <button ><Link to="/addTeacher" className={this.props.classes.linkbtn}>Add Teacher</Link></button>
-              <br/>
-              <button onClick={()=>(this.handleTableExapand("Teacher"))}>Show</button>
-            </div>
-            <MainCard title='Student' value={this.props.dashboardDetails.studentActive} total={this.props.dashboardDetails.studentActive + this.props.dashboardDetails.studentBlocked} image={StudentImg} />
-            <button onClick={()=>(this.handleTableExapand("Student"))}>Show</button>
-            <MainCard title='Subject' value={this.props.dashboardDetails.subjectActive} total={this.props.dashboardDetails.subjectActive + this.props.dashboardDetails.subjectBlocked} image={SubjectImg} />
-            <div className={this.props.classes.inlineblock}>
-              <button ><Link to="/addSubject" className={this.props.classes.linkbtn}>Add Subject</Link></button>
-              <br/>
-              <button onClick={()=>(this.handleTableExapand("Subject"))}>Show</button>
-            </div>
-            <br/>
-
-            {x}
-          </div>
-        );
-
     }
-    
+    if (!this.props.dashboardDetails.retrived) {
+      this.props.getDashboardCount();
+    }
+  }
+
+  logout = () => {
+    this.props.logoutUser();
+  };
+
+  toggleTableExpand = (type) => {
+    this.setState((prevState) => ({
+      expandedTable: prevState.expandedTable === type ? null : type,
+    }));
+  };
+
+  renderTable() {
+    const { expandedTable } = this.state;
+    switch (expandedTable) {
+      case "Teacher":
+        return <TeacherTable />;
+      case "Student":
+        return <StudentTable />;
+      case "Subject":
+        return <SubjectTable />;
+      default:
+        return null;
+    }
+  }
+
+  render() {
+    const { user, dashboardDetails } = this.props;
+
+    if (!Auth.retriveToken() || Auth.retriveToken() === "undefined") {
+      return <Navigate to="/" />;
+    }
+
+    if (!user.isLoggedIn) {
+      return <div>Loading...</div>;
+    }
+
+    return (
+      <div className="dashboard-container">
+        <HomepageHeader title="Exam Portal" img={logoImg} />
+        <button className="logout-btn" onClick={this.logout}>
+          Logout
+        </button>
+
+        <MainCard
+          title="Teacher"
+          value={dashboardDetails.teacherActive}
+          total={dashboardDetails.teacherActive + dashboardDetails.teacherBlocked}
+          image={TeacherImg}
+        />
+        <div className="inline-block">
+          <Link to="/addTeacher" className="link-btn">
+            <button className="dashboard-button">Add Teacher</button>
+          </Link>
+          <br />
+          <button
+            className="dashboard-button"
+            onClick={() => this.toggleTableExpand("Teacher")}
+          >
+            {this.state.expandedTable === "Teacher" ? "Hide" : "Show"}
+          </button>
+        </div>
+
+        <MainCard
+          title="Student"
+          value={dashboardDetails.studentActive}
+          total={dashboardDetails.studentActive + dashboardDetails.studentBlocked}
+          image={StudentImg}
+        />
+        <div className="inline-block">
+          <button
+            className="dashboard-button"
+            onClick={() => this.toggleTableExpand("Student")}
+          >
+            {this.state.expandedTable === "Student" ? "Hide" : "Show"}
+          </button>
+        </div>
+
+        <MainCard
+          title="Subject"
+          value={dashboardDetails.subjectActive}
+          total={dashboardDetails.subjectActive + dashboardDetails.subjectBlocked}
+          image={SubjectImg}
+        />
+        <div className="inline-block">
+          <Link to="/addSubject" className="link-btn">
+            <button className="dashboard-button">Add Subject</button>
+          </Link>
+          <br />
+          <button
+            className="dashboard-button"
+            onClick={() => this.toggleTableExpand("Subject")}
+          >
+            {this.state.expandedTable === "Subject" ? "Hide" : "Show"}
+          </button>
+        </div>
+
+        <br />
+        {this.renderTable()}
+      </div>
+    );
   }
 }
 
-const mapStateToProps = state => ({
-  user:state.user,
-  dashboardDetails:state.dashboardDetails
+const mapStateToProps = (state) => ({
+  user: state.user,
+  dashboardDetails: state.dashboardDetails,
 });
 
-export default withStyles(useStyles)(connect(mapStateToProps,{
+export default connect(mapStateToProps, {
   logoutUser,
   getAdminDetails,
   getDashboardCount,
-})(DashboardMain));
+})(DashboardMain);

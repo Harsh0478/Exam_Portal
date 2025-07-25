@@ -1,115 +1,151 @@
-import React from "react"
+import React from "react";
 import { connect } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
 import Alert from "../../../services/alert";
 import Auth from "../../../services/Auth";
 import { getAdminDetails } from "../../../redux/actions/loginAction";
-import "./AddTeacher.css"
+import "./AddTeacher.css";
 import axios from "axios";
 import apis from "../../../services/Apis";
 
 class AddTeacher extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      name : "",
-      email : "",
-      password : "",
-      confirmpassword : ""
-    }
+      name: "",
+      email: "",
+      password: "",
+      confirmpassword: "",
+      loading: false,
+    };
   }
 
-  nameInputHandler = (event)=>{
-    this.setState({
-      ...this.state,
-      name : event.target.value
-    });
-  }
+  handleChange = (field) => (event) => {
+    this.setState({ [field]: event.target.value });
+  };
 
-  emailInputHandler = (event)=> {
-    this.setState({
-      ...this.state,
-      email : event.target.value
-    })
-  }
-
-  passwordInputHandler = (event)=> {
-    this.setState({
-      ...this.state,
-      password : event.target.value
-    })
-  }
-
-  confirmInputHandler = (event)=> {
-    this.setState({
-      ...this.state,
-      confirmpassword : event.target.value
-    })
-  }
-  
-  handleSubmit= (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault();
-    if(this.state.confirmpassword !== this.state.password) {
-      Alert('error','Invalid Input','Confirm Password does not match')  
+    const { name, email, password, confirmpassword } = this.state;
+
+    if (password !== confirmpassword) {
+      Alert("error", "Invalid Input", "Confirm Password does not match");
+      return;
     }
-    console.log(this.state);
-    axios.post(apis.BASE + apis.ADD_TEACHER, {
-      username : this.state.name,
-      email : this.state.email,
-      password : this.state.password
-    },{
-      headers:{
-        'Authorization':`Bearer ${Auth.retriveToken()}`
-      }
-    }).then(response => {
-      console.log(response.data);
-      if(response.data.success) {
-        Alert('info','Success',response.data.message);
+
+    try {
+      this.setState({ loading: true });
+      const response = await axios.post(
+        apis.BASE + apis.ADD_TEACHER,
+        { username: name, email, password },
+        {
+          headers: {
+            Authorization: `Bearer ${Auth.retriveToken()}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        Alert("info", "Success", response.data.message);
+        // Optionally clear form after success
+        this.setState({
+          name: "",
+          email: "",
+          password: "",
+          confirmpassword: "",
+        });
       } else {
-        Alert('error','Failed',response.data.message);
+        Alert("error", "Failed", response.data.message);
       }
-    })
+    } catch (error) {
+      Alert("error", "Error", error.message || "Something went wrong");
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
+
+  componentDidMount() {
+    if (!this.props.user.isLoggedIn) {
+      this.props.getAdminDetails();
+    }
   }
 
-  render(){
-    if(!Auth.retriveToken() || Auth.retriveToken()==='undefined'){
-      return (<Navigate to='/'/>);
-    } else if(!this.props.user.isLoggedIn) {
-      this.props.getAdminDetails();
-      return (<div></div>)
+  render() {
+    if (!Auth.retriveToken() || Auth.retriveToken() === "undefined") {
+      return <Navigate to="/" />;
     }
+
+    if (!this.props.user.isLoggedIn) {
+      // You can show a loader here if you want
+      return <div>Loading...</div>;
+    }
+
+    const { name, email, password, confirmpassword, loading } = this.state;
+
     return (
-      
       <form onSubmit={this.handleSubmit} className="form-class">
         <h2>Add Teacher</h2>
-        <div>
-          <label> Name </label>
-          <input type='Text' value={this.state.name} onChange={this.nameInputHandler} required/>
+        <div className="form-group">
+          <label htmlFor="name">Name</label>
+          <input
+            id="name"
+            type="text"
+            value={name}
+            onChange={this.handleChange("name")}
+            required
+            disabled={loading}
+          />
         </div>
-        <div>
-          <label> Email </label>
-          <input type='email' value={this.state.email} onChange={this.emailInputHandler} required/>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={this.handleChange("email")}
+            required
+            disabled={loading}
+          />
         </div>
-        <div>
-          <label> Password </label>
-          <input type='password' value={this.state.password} onChange={this.passwordInputHandler} required/>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={this.handleChange("password")}
+            required
+            disabled={loading}
+          />
         </div>
-        <div>
-          <label> Confirm Password </label>
-          <input type='password' value={this.state.confirmpassword} onChange={this.confirmInputHandler} required/>
+        <div className="form-group">
+          <label htmlFor="confirmpassword">Confirm Password</label>
+          <input
+            id="confirmpassword"
+            type="password"
+            value={confirmpassword}
+            onChange={this.handleChange("confirmpassword")}
+            required
+            disabled={loading}
+          />
         </div>
-        <button type="submit"> Add Teacher</button>
-        <br/>
-        <button> <Link className="linkbtn" to='/home'>back</Link></button>
+
+        <button type="submit" disabled={loading} className="submit-btn">
+          {loading ? "Adding..." : "Add Teacher"}
+        </button>
+
+        <Link className="back-link" to="/home">
+          ← Back to Home
+        </Link>
       </form>
-    )
+    );
   }
 }
 
-const mapStateToProps = state => ({
-  user:state.user
+const mapStateToProps = (state) => ({
+  user: state.user,
 });
 
-export default connect(mapStateToProps,{
-  getAdminDetails
+export default connect(mapStateToProps, {
+  getAdminDetails,
 })(AddTeacher);

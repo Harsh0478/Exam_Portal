@@ -1,15 +1,55 @@
-th, td {
-  border : 1px solid black;
-}
+/* teacherTable.css */
 
 .main {
   background-color: aliceblue;
-  color:black;
+  color: black;
   padding: 20px 100px;
   display: inline-block;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .title {
-  color:black;
+  color: black;
   text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  border: 1px solid #aaa;
+  padding: 10px;
+  text-align: center;
+  font-size: 16px;
+}
+
+th {
+  background-color: #e0f2fe; /* light blue */
+}
+
+button {
+  padding: 6px 12px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+}
+
+button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
 }

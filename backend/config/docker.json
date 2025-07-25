@@ -1,9 +1,8 @@
 {
   "mongodb": {
-    "connectionString": "mongodb://admin:password@mongodb:27017/online-exam-portal",
-    "authDB":"admin"
+    "connectionString": "mongodb+srv://test:test047@test.9govf9m.mongodb.net/online-exam-portal?retryWrites=true&w=majority"
   },
   "jwt": {
-      "secret" : "mysecret"
+    "secret": "mysecret"
   }
 }

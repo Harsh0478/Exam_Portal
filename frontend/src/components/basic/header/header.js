@@ -1,42 +1,47 @@
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
 import { createTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
-import './header.css';
 
-const useStyles = makeStyles({
-  logoimg : {
-    margin:0,
-    padding:0,
-    height:50
+const useStyles = makeStyles((theme) => ({
+  logoimg: {
+    height: 50,
+    marginRight: theme.spacing(2),
   },
-  name :{
-    margin : 20,
-    color:'#07cfda'
-  }
-})
+  title: {
+    flexGrow: 1,
+    color: '#07cfda',
+    fontWeight: 700,
+    fontSize: '1.5rem',
+    userSelect: 'none',
+  },
+  appBar: {
+    backgroundColor: '#000000dd', // Slightly transparent black for style
+  },
+}));
 
 const theme = createTheme({
-  palette:{
-    primary:{
-      main:'#00000077'
-    }
-  }
-})
+  palette: {
+    primary: {
+      main: '#000000dd',
+    },
+  },
+});
 
-export const HomepageHeader = (props)=>{
+export const HomepageHeader = ({ img, title }) => {
   const classes = useStyles();
+
   return (
     <ThemeProvider theme={theme}>
-      <AppBar>
+      <AppBar position="static" className={classes.appBar} elevation={4}>
         <Toolbar>
-          <img src={props.img} alt="Logo" className={classes.logoimg}/>
-          <div className={classes.name} >
-            {props.title}
-          </div>
+          <img src={img} alt="Logo" className={classes.logoimg} />
+          <Typography variant="h6" className={classes.title} noWrap>
+            {title}
+          </Typography>
         </Toolbar>
       </AppBar>
     </ThemeProvider>
-      
   );
-}
+};

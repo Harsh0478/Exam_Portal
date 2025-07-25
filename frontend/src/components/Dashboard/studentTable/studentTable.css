@@ -1,15 +1,59 @@
-th, td {
-  border : 1px solid black;
-}
-
+/* Container styling */
 .main {
   background-color: aliceblue;
-  color:black;
+  color: black;
   padding: 20px 100px;
   display: inline-block;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Title styling */
 .title {
-  color:black;
+  color: black;
   text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+/* Table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  border: 1px solid black;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+/* Table header styling */
+thead {
+  background-color: #07cfda;
+  color: white;
+}
+
+/* Button styling */
+button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  background-color: #07cfda;
+  color: black;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  background-color: #a1d6e2;
+  cursor: not-allowed;
+}
+
+button:not(:disabled):hover {
+  background-color: #05aabf;
+  color: white;
 }

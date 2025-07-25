@@ -1,65 +1,74 @@
-import { connect } from "react-redux"
 import React from "react";
-import {getStudentDetails, StudentToggleStatus}  from "../../../redux/actions/studentDetails";
-import './studentTable.css'
-
+import { connect } from "react-redux";
+import { getStudentDetails, StudentToggleStatus } from "../../../redux/actions/studentDetails";
+import './studentTable.css';
 
 class StudentTable extends React.Component {
-    constructor(props) {
-      super(props)
-      this.state = {}
+  constructor(props) {
+    super(props);
+    this.state = {
+      togglingId: null, // for disabling button while toggling status
+    };
+  }
+
+  handleStatusChange = async (currentStatus, id) => {
+    this.setState({ togglingId: id });
+    await this.props.StudentToggleStatus(currentStatus, id, this.props.getStudentDetails);
+    this.setState({ togglingId: null });
+  };
+
+  buttonTextBasedOnStatus = (status) => {
+    // If true = active, show 'Block' button; if false = blocked, show 'Unblock'
+    return status ? "Block" : "Unblock";
+  };
+
+  render() {
+    const { students } = this.props;
+
+    if (!students.retrived) {
+      this.props.getStudentDetails();
+      return <div>Collecting data...</div>;
     }
 
-    handleStatusChange(status, id) {
-      this.props.StudentToggleStatus(status,id,this.props.getStudentDetails);
-    }
-
-    buttonTextBasedOnStatus(status) {
-      if(status === true) {
-        return("block");
-      } else {
-        return("unblock");
-      }
-    }
-
-    render(){
-      if(this.props.students.retrived===false) {
-        this.props.getStudentDetails();
-        return (<div>Collecting data</div>);
-      }
-
-      return (
+    return (
       <div className="main">
-        <h2 className="title">Students</h2> 
+        <h2 className="title">Students</h2>
         <table>
           <thead>
-          <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
           </thead>
           <tbody>
-          {this.props.students.list.map((val,key)=>{
-            return (
-              <tr key={key}>
-                <td>{val.name}</td>
-                <td>{val.status.toString()}</td>
-                <td><button onClick={()=>(this.handleStatusChange(val.status,val.id))}>{this.buttonTextBasedOnStatus(val.status)}</button></td>
+            {students.list.map((student) => (
+              <tr key={student.id}>
+                <td>{student.name}</td>
+                <td>{student.status ? "Active" : "Blocked"}</td>
+                <td>
+                  <button
+                    onClick={() => this.handleStatusChange(student.status, student.id)}
+                    disabled={this.state.togglingId === student.id}
+                    style={{ cursor: this.state.togglingId === student.id ? "not-allowed" : "pointer" }}
+                  >
+                    {this.buttonTextBasedOnStatus(student.status)}
+                  </button>
+                </td>
               </tr>
-            )
-          })}
+            ))}
           </tbody>
         </table>
-      </div>)
-    }
+      </div>
+    );
+  }
 }
 
-const mapStateToProps = state => ({
-  students : state.students
+const mapStateToProps = (state) => ({
+  students: state.students,
 });
 
-export default connect(mapStateToProps,{
+export default connect(mapStateToProps, {
   getStudentDetails,
-  StudentToggleStatus
+  StudentToggleStatus,
 })(StudentTable);
